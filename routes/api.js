@@ -47,7 +47,6 @@ router.put('/guide/:id', async(req, res, next) => {
 
   // ----------------- GET ALL GUIDES ----------------
   router.get('/guides',  async(req, res, next) => {
-    console.log('inside the guides route')
     try {
       const guides = await Guide.find()
       res.json(guides)
@@ -56,6 +55,18 @@ router.put('/guide/:id', async(req, res, next) => {
     }
   })
 
+
+  //---------------- USER ---------------------
+  router.get('/user', async(req, res, next) => {
+    const { _id } = req.session.currentUser;
+    try {
+      const user = await User.findById(_id);
+      console.log(user)
+      res.json(user)
+    }catch(error){
+      next(error)
+    }
+  })
 
 
 module.exports = router;
