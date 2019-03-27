@@ -46,7 +46,7 @@ router.put('/guide/:id', isLoggedIn(), async(req, res, next) => {
   }
 })
 
-//------------ ADD GUIDES TO FAVORITE ------------
+//------------ ADD/REMOVE GUIDES TO/FROM FAVORITE ------------
 router.put('/favorites/:id', isLoggedIn(), async(req, res, next) => {
   const { id } = req.params;
   const { _id } = req.session.currentUser;
@@ -60,6 +60,25 @@ router.put('/favorites/:id', isLoggedIn(), async(req, res, next) => {
     if(!checkIfEmpty(hasFavorite)){
       const removeFavorite = await User.findByIdAndUpdate(_id, {$pull: {favorites: guide._id}}, {new: true})
       res.json(removeFavorite)
+    }
+  } catch(error){
+    next(error)
+  }
+})
+
+// -------------------- DELETE GUIDES ---------------
+router.delete('/:id', isLoggedIn(), async (req, res, next) => {
+  const { id } = req.params;
+  const { _id: userId } = req.session.currentUser;
+  try {
+    const guide = await Guide.findById(id).populate('creator')
+    const creatorId = guide.creator._id;
+    if(checkEqual(creatorId, userId)){
+      await Guide.findByIdAndDelete(id)
+      res.status(200).json({message: 'Guide Deleted!'})
+    }
+    if(!checkEqual(creatorId, userId)){
+      res.json({message: 'This is not your Guide, you can`t delete it!'})
     }
   } catch(error){
     next(error)
@@ -93,7 +112,6 @@ router.put('/favorites/:id', isLoggedIn(), async(req, res, next) => {
     const { _id } = req.session.currentUser;
     try {
       const user = await User.findById(_id);
-      console.log(user)
       res.json(user)
     }catch(error){
       next(error)
