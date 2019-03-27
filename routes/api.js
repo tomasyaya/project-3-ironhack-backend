@@ -4,6 +4,9 @@ const Guide = require('../models/Guide')
 const User = require('../models/User')
 const { checkEqual } = require('../helpers/validation')
 
+
+
+// ----------- CREATE GUIDE -----------------
 router.post('/guide', async (req, res, next) => {
   const { _id } = req.session.currentUser;
   const { location, title } = req.body;
@@ -22,6 +25,8 @@ router.post('/guide', async (req, res, next) => {
   }
 })
 
+
+// ------------- EDIT GUIDE --------------------
 router.put('/guide/:id', async(req, res, next) => {
   const { _id: userId } = req.session.currentUser;
   const { id } = req.params;
@@ -31,13 +36,26 @@ router.put('/guide/:id', async(req, res, next) => {
     const guide = await Guide.findById(id).populate('creator')
     const creatorId = guide.creator._id;
     if(checkEqual(creatorId, userId)){
-      const updateGuide = await Guide.findByIdAndUpdate(id, {$push: {places: place}}, {new: true})
+      const updateGuide = await Guide.findByIdAndUpdate(id, {$push: {places: place}}, {new: true});
+      res.json(updateGuide)
     }
-    res.json(guide)
+    res.json({message: 'Not your guide, cant update it'})
   }catch(error){
     res.json(error)
   }
 })
+
+  // ----------------- GET ALL GUIDES ----------------
+  router.get('/guides',  async(req, res, next) => {
+    console.log('inside the guides route')
+    try {
+      const guides = await Guide.find()
+      res.json(guides)
+    }catch(error) {
+      next(error)
+    }
+  })
+
 
 
 module.exports = router;
