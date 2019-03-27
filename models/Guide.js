@@ -8,6 +8,12 @@ const guideSchema = new Schema({
     type: ObjectId,
     required: true
   },
+  location: {
+    type: String
+  },
+  title: {
+    type: String
+  },
   places: [{
     name: String,
     description: String,
