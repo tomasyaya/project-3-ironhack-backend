@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Guide = require('../models/Guide')
 const User = require('../models/User')
-const { checkEqual } = require('../helpers/validation')
+const { checkEqual, checkIfEmpty } = require('../helpers/validation')
 const { isLoggedIn } = require('../helpers/middlewares');
 
 
@@ -52,10 +52,15 @@ router.put('/favorites/:id', isLoggedIn(), async(req, res, next) => {
   const { _id } = req.session.currentUser;
   try{
     const guide = await Guide.findById(id);
-    const favorite = await User.find({favorites: guide})
-    console.log(guide)
-    
-    
+    const hasFavorite = await User.find({favorites: guide._id})
+    if(checkIfEmpty(hasFavorite)){
+      const addToFavorite = await User.findByIdAndUpdate(_id, {$push: {favorites: guide}}, {new: true})  
+      res.json(addToFavorite)
+    }
+    if(!checkIfEmpty(hasFavorite)){
+      const removeFavorite = await User.findByIdAndUpdate(_id, {$pull: {favorites: guide._id}}, {new: true})
+      res.json(removeFavorite)
+    }
   } catch(error){
     next(error)
   }

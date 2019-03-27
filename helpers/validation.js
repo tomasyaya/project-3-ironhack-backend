@@ -5,3 +5,11 @@ exports.checkEqual = (one, two) => {
     return false
   }
 }
+
+exports.checkIfEmpty = (one) => {
+  if(one.length === 0) {
+    return true
+  } else {
+    return false
+  }
+}
