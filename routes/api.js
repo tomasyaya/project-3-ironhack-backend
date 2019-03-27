@@ -3,11 +3,12 @@ const router = express.Router();
 const Guide = require('../models/Guide')
 const User = require('../models/User')
 const { checkEqual } = require('../helpers/validation')
+const { isLoggedIn } = require('../helpers/middlewares');
 
 
 
 // ----------- CREATE GUIDE -----------------
-router.post('/guide', async (req, res, next) => {
+router.post('/guide', isLoggedIn(), async (req, res, next) => {
   const { _id } = req.session.currentUser;
   const { location, title } = req.body;
   try {
@@ -27,7 +28,7 @@ router.post('/guide', async (req, res, next) => {
 
 
 // ------------- EDIT GUIDE --------------------
-router.put('/guide/:id', async(req, res, next) => {
+router.put('/guide/:id', isLoggedIn(), async(req, res, next) => {
   const { _id: userId } = req.session.currentUser;
   const { id } = req.params;
   const { location, name, what, description } = req.body;
@@ -45,8 +46,23 @@ router.put('/guide/:id', async(req, res, next) => {
   }
 })
 
-  // ----------------- GET ALL GUIDES ----------------
-  router.get('/guides',  async(req, res, next) => {
+//------------ ADD GUIDES TO FAVORITE ------------
+router.put('/favorites/:id', isLoggedIn(), async(req, res, next) => {
+  const { id } = req.params;
+  const { _id } = req.session.currentUser;
+  try{
+    const guide = await Guide.findById(id);
+    const favorite = await User.find({favorites: guide})
+    console.log(guide)
+    
+    
+  } catch(error){
+    next(error)
+  }
+})
+
+// ----------------- GET ALL GUIDES ----------------
+  router.get('/guides', isLoggedIn(), async(req, res, next) => {
     try {
       const guides = await Guide.find()
       res.json(guides)
@@ -55,9 +71,8 @@ router.put('/guide/:id', async(req, res, next) => {
     }
   })
 
-  //------------------ GET GUIDES CREATED BY ME --------------
-
-  router.get('/guides/user', async(req, res, next) => {
+//------------------ GET GUIDES CREATED BY ME --------------
+  router.get('/guides/user', isLoggedIn(), async(req, res, next) => {
     const { _id } = req.session.currentUser;
     try{
       const guides = await Guide.find({creator: _id})
@@ -68,8 +83,8 @@ router.put('/guide/:id', async(req, res, next) => {
   })
 
 
-  //----------------GET USER ---------------------
-  router.get('/user', async(req, res, next) => {
+//----------------GET USER ---------------------
+  router.get('/user', isLoggedIn(), async(req, res, next) => {
     const { _id } = req.session.currentUser;
     try {
       const user = await User.findById(_id);
