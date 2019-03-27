@@ -55,8 +55,20 @@ router.put('/guide/:id', async(req, res, next) => {
     }
   })
 
+  //------------------ GET GUIDES CREATED BY ME --------------
 
-  //---------------- USER ---------------------
+  router.get('/guides/user', async(req, res, next) => {
+    const { _id } = req.session.currentUser;
+    try{
+      const guides = await Guide.find({creator: _id})
+      res.json(guides)
+    }catch(error){
+      next(error)
+    }
+  })
+
+
+  //----------------GET USER ---------------------
   router.get('/user', async(req, res, next) => {
     const { _id } = req.session.currentUser;
     try {
