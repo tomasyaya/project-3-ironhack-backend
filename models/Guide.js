@@ -6,7 +6,8 @@ const ObjectId = Schema.Types.ObjectId
 const guideSchema = new Schema({
   creator: {
     type: ObjectId,
-    required: true
+    required: true,
+    ref: 'User'
   },
   location: {
     type: String
