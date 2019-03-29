@@ -45,6 +45,18 @@ router.put('/guide/:id', isLoggedIn(), async(req, res, next) => {
   }
 })
 
+// ------------- DELETE PLACE IN GUIDE -------
+
+router.put('/places/:id/:place', isLoggedIn(), async (req, res, next) => {
+  const { id, place } = req.params;
+  try {
+    const deletePlace = await Guide.findByIdAndUpdate(id, {$pull: {places: {place}}})
+    console.log(deletePlace)
+  }catch(error){
+    console.log(error)
+  }
+})
+
 //------------ ADD/REMOVE GUIDES TO/FROM FAVORITE ------------
 router.put('/favorites/:id', isLoggedIn(), async(req, res, next) => {
   const { id } = req.params;
