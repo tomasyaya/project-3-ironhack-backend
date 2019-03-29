@@ -13,7 +13,6 @@ router.post('/guide', isLoggedIn(), async (req, res, next) => {
   const { location, title } = req.body;
   try {
     const newUser = await User.findById(_id)
-    console.log(newUser._id)
     const guide = {
       location,
       title,
@@ -85,6 +84,17 @@ router.delete('/:id', isLoggedIn(), async (req, res, next) => {
   }
 })
 
+//----------------- GET SPECIFIC GUIDE -------------
+router.get('/guide/:id', isLoggedIn(), async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const guide = await Guide.findById(id);
+    res.json(guide)
+  } catch(error){
+    next(error)
+  }
+})
+
 // ----------------- GET ALL GUIDES ----------------
   router.get('/guides', isLoggedIn(), async(req, res, next) => {
     try {
@@ -105,6 +115,18 @@ router.delete('/:id', isLoggedIn(), async (req, res, next) => {
       next(error)
     }
   })
+
+// ------------ GET FAVORITES ---------------
+router.get('/favorites', isLoggedIn(), async (req, res, next) => {
+  const { _id } = req.session.currentUser;
+  try {
+    const favorites = await User.findById(_id).populate('favorites');
+    console.log(favorites);
+    res.json(favorites)
+  } catch(error){
+    console.log(error)
+  }
+})
 
 
 //----------------GET USER ---------------------

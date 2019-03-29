@@ -73,11 +73,12 @@ router.post('/signup', isNotLoggedIn(), validationLoggin(), (req, res, next) => 
 });
 
 router.post('/logout', isLoggedIn(), (req, res, next) => {
+  console.log(req.session.currentUser)
   req.session.destroy();
   return res.status(204).send();
 });
 
-router.get('/private', isLoggedIn(), (req, res, next) => {
+router.get('/', isLoggedIn(), (req, res, next) => {
   res.status(200).json({
     message: 'This is a private message'
   });
