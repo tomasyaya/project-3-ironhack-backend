@@ -37,6 +37,7 @@ router.put('/guide/:id', isLoggedIn(), async(req, res, next) => {
     const creatorId = guide.creator._id;
     if(checkEqual(creatorId, userId)){
       const updateGuide = await Guide.findByIdAndUpdate(id, {$push: {places: place}}, {new: true});
+      console.log(updateGuide)
       res.json(updateGuide)
     }
     res.json({message: 'Not your guide, cant update it'})
@@ -49,8 +50,12 @@ router.put('/guide/:id', isLoggedIn(), async(req, res, next) => {
 
 router.put('/places/:id/:place', isLoggedIn(), async (req, res, next) => {
   const { id, place } = req.params;
+  const remove = {
+    _id: place
+  }
   try {
-    const deletePlace = await Guide.findByIdAndUpdate(id, {$pull: {places: {place}}})
+    const deletePlace = await Guide.findByIdAndUpdate(id, {$pull: {places: remove }}, {new: true})
+    res.json(deletePlace)
     console.log(deletePlace)
   }catch(error){
     console.log(error)
