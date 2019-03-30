@@ -15,6 +15,11 @@ const guideSchema = new Schema({
   title: {
     type: String
   },
+  comments: [{
+    creator: ObjectId,
+    name: String,
+    comment: String
+  }],
   places: [{
     name: String,
     description: String,

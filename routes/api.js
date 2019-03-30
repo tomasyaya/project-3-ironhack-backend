@@ -46,6 +46,37 @@ router.put('/guide/:id', isLoggedIn(), async(req, res, next) => {
   }
 })
 
+// ---------- COMMENTS -------------
+
+router.put('/comments/:id', isLoggedIn(), async (req, res, next) => {
+  const { _id } = req.session.currentUser;
+  const { id } = req.params;
+  const { message } = req.body;
+  try {
+    const user = await User.findById(_id);
+    const { username } = user;
+    const newComment = {
+      creator: _id,
+      name: username,
+      comment: message
+    }
+    const comment = await Guide.findByIdAndUpdate(id, {$push: { comments: newComment }}, { new: true });
+    console.log(comment)
+    res.json(comment)
+  } catch(error) {
+    next(error)
+  }
+});
+
+// router.get('/comments/:id', isLoggedIn(), async (req, res, next) => {
+//   const { id } = req.params;
+//   try {
+//     const comments = await
+//   } catch(error) {
+//     next(error)
+//   }
+// })
+
 // ------------- DELETE PLACE IN GUIDE -------
 
 router.put('/places/:id/:place', isLoggedIn(), async (req, res, next) => {
@@ -105,7 +136,7 @@ router.delete('/:id', isLoggedIn(), async (req, res, next) => {
 router.get('/guide/:id', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
   try {
-    const guide = await Guide.findById(id);
+    const guide = await Guide.findById(id).populate('comments').populate('creator');
     res.json(guide)
   } catch(error){
     next(error)
