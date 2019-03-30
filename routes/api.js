@@ -68,14 +68,21 @@ router.put('/comments/:id', isLoggedIn(), async (req, res, next) => {
   }
 });
 
-// router.get('/comments/:id', isLoggedIn(), async (req, res, next) => {
-//   const { id } = req.params;
-//   try {
-//     const comments = await
-//   } catch(error) {
-//     next(error)
-//   }
-// })
+// --------------- DELETE COMMENT ---------
+
+router.delete('/comments/:guide/:id', isLoggedIn(), async (req, res, next) => {
+  const { id, guide } = req.params;
+  const comment = {
+    _id: id
+  }
+  try {
+    const removeComment = await Guide.findByIdAndUpdate(guide, {$pull: {comments: comment}}, {new: true})
+    console.log(removeComment) 
+    res.json(removeComment)
+  } catch(error) {
+    next(error)
+  }
+})
 
 // ------------- DELETE PLACE IN GUIDE -------
 
