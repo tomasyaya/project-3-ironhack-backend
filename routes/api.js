@@ -138,21 +138,50 @@ router.delete('/:id', isLoggedIn(), async (req, res, next) => {
 
 // ------------- CREATE NEW CHAT ------------
 
-router.post('/chat/:id', isLoggedIn(), async (req, res, next) => {
+router.post('/chat/:id',  async (req, res, next) => {
   const { _id } = req.session.currentUser;
   const { id } = req.params;
   const newChat = {
-    craator: _id,
+    creator: _id,
     participant: id
   }
   try {
+    const checkChat = await Chat.find(newChat)
+    if(checkChat){
+      console.log('chat already created')
+      return
+    }
     const chat = await Chat.create(newChat, { new: true })
-    console.log(chat)
     res.json(chat)
   }catch(error) {
     next(error)
   }
 })
+
+// ------- ADD MESSAGE TO CHAT ---------
+router.put('/chat/:id', async (req, res, next) => {
+  const { id } = req.params;
+  const { _id } = req.session.currentUser;
+  const { message } = req.body;
+  const findChat = {
+    creator: _id,
+    participant: id
+  }
+  try {
+    const user = await User.findById(_id);
+    const searchChat = await Chat.find(findChat);
+    const { _id: chatId } = searchChat[0]
+    const newMessage = {
+      author: user.username,
+      message: message
+    }
+    const addMessage = await Chat.findByIdAndUpdate(chatId, {$push: { messages: newMessage } }, { new: true })
+    console.log(addMessage);
+    res.json(addMessage);
+  } catch(error) {
+    next(error)
+  }
+});
 
 
 
