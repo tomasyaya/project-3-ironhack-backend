@@ -163,16 +163,16 @@ router.put('/chat/:id', async (req, res, next) => {
   const { id } = req.params;
   const { _id } = req.session.currentUser;
   const { message } = req.body;
-  const findChat = {
+  const searchChat = {
     creator: _id,
     participant: id
   }
   try {
-    const user = await User.findById(_id);
-    const searchChat = await Chat.find(findChat);
-    const { _id: chatId } = searchChat[0]
+    const { username } = await User.findById(_id);
+    const findChat = await Chat.find(searchChat);
+    const { _id: chatId } = findChat[0]
     const newMessage = {
-      author: user.username,
+      author: username,
       message: message
     }
     const addMessage = await Chat.findByIdAndUpdate(chatId, {$push: { messages: newMessage } }, { new: true })
@@ -182,6 +182,24 @@ router.put('/chat/:id', async (req, res, next) => {
     next(error)
   }
 });
+
+// ----------- GET CHAT ---------
+
+router.get('/chat/:id', async (req, res, next) => {
+  const { id } = req.params;
+  const { _id } = req.session.currentUser;
+  const searchChat = {
+    creator: _id,
+    participant: id
+  }
+  try {
+    const chat = await Chat.find(searchChat);
+    console.log(chat)
+    res.json(chat)
+  } catch(error) {
+    next(error)
+  }
+})
 
 
 
