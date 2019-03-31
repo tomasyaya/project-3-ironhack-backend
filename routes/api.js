@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const Guide = require('../models/Guide')
-const User = require('../models/User')
+const Guide = require('../models/Guide');
+const Chat = require('../models/test');
+const User = require('../models/User');
 const { checkEqual, checkIfEmpty } = require('../helpers/validation')
 const { isLoggedIn } = require('../helpers/middlewares');
 
@@ -37,7 +38,6 @@ router.put('/guide/:id', isLoggedIn(), async(req, res, next) => {
     const creatorId = guide.creator._id;
     if(checkEqual(creatorId, userId)){
       const updateGuide = await Guide.findByIdAndUpdate(id, {$push: {places: place}}, {new: true});
-      console.log(updateGuide)
       res.json(updateGuide)
     }
     res.json({message: 'Not your guide, cant update it'})
@@ -61,7 +61,6 @@ router.put('/comments/:id', isLoggedIn(), async (req, res, next) => {
       comment: message
     }
     const comment = await Guide.findByIdAndUpdate(id, {$push: { comments: newComment }}, { new: true });
-    console.log(comment)
     res.json(comment)
   } catch(error) {
     next(error)
@@ -76,8 +75,7 @@ router.delete('/comments/:guide/:id', isLoggedIn(), async (req, res, next) => {
     _id: id
   }
   try {
-    const removeComment = await Guide.findByIdAndUpdate(guide, {$pull: {comments: comment}}, {new: true})
-    console.log(removeComment) 
+    const removeComment = await Guide.findByIdAndUpdate(guide, {$pull: {comments: comment}}, {new: true}) 
     res.json(removeComment)
   } catch(error) {
     next(error)
@@ -94,7 +92,6 @@ router.put('/places/:id/:place', isLoggedIn(), async (req, res, next) => {
   try {
     const deletePlace = await Guide.findByIdAndUpdate(id, {$pull: {places: remove }}, {new: true})
     res.json(deletePlace)
-    console.log(deletePlace)
   }catch(error){
     console.log(error)
   }
@@ -139,6 +136,26 @@ router.delete('/:id', isLoggedIn(), async (req, res, next) => {
   }
 })
 
+// ------------- CREATE NEW CHAT ------------
+
+router.post('/chat/:id', isLoggedIn(), async (req, res, next) => {
+  const { _id } = req.session.currentUser;
+  const { id } = req.params;
+  const newChat = {
+    craator: _id,
+    participant: id
+  }
+  try {
+    const chat = await Chat.create(newChat, { new: true })
+    console.log(chat)
+    res.json(chat)
+  }catch(error) {
+    next(error)
+  }
+})
+
+
+
 //----------------- GET SPECIFIC GUIDE -------------
 router.get('/guide/:id', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
@@ -176,7 +193,6 @@ router.get('/favorites', isLoggedIn(), async (req, res, next) => {
   const { _id } = req.session.currentUser;
   try {
     const favorites = await User.findById(_id).populate('favorites');
-    console.log(favorites);
     res.json(favorites)
   } catch(error){
     console.log(error)
