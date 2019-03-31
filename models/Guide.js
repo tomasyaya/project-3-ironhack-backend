@@ -24,13 +24,17 @@ const guideSchema = new Schema({
     name: String,
     description: String,
     what: String,
-    location: String
+    location: String,
+    image: String,
+    images: [{
+      image_url: {
+        type: String
+      }
+    }]
   }],
-}, {
-  timestamps: {
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
-  },
+  image: {
+    type: String
+  }
 });
 
 const Guide = mongoose.model('Guide', guideSchema);
