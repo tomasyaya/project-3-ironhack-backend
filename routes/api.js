@@ -201,6 +201,22 @@ router.get('/chat/:id', async (req, res, next) => {
   }
 })
 
+//------ DELETE MESSAGE FROM CHAT ------
+router.delete('/chat/:id/:participant', async (req, res, next) => {
+  const { id, participant } = req.params;
+  const chat = {
+    participant
+  }
+  try {
+    const findChat = await Chat.find(chat)
+    const { _id } = findChat[0]
+    const removeChat = await Chat.findByIdAndUpdate(_id, {$pull: { messages: { _id: id } } }, { new: true })
+    res.json(removeChat)
+  } catch(error){
+    console.log(error)
+  }
+})
+
 
 
 //----------------- GET SPECIFIC GUIDE -------------
