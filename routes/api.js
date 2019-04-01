@@ -162,13 +162,12 @@ router.post('/chat/:id',  async (req, res, next) => {
   }
   try {
     const checkChat = await Chat.find(newChat)
-    if(checkChat){
-      console.log('chat already created')
-      return
+    if(checkIfEmpty(checkChat)){
+      const chat = await Chat.create(newChat, { new: true })
+      console.log(chat)
+      res.json(chat)
     }
-    const chat = await Chat.create(newChat, { new: true })
-    res.json(chat)
-  }catch(error) {
+  } catch(error) {
     next(error)
   }
 })
@@ -190,9 +189,12 @@ router.put('/chat/:id', async (req, res, next) => {
       author: username,
       message: message
     }
-    const addMessage = await Chat.findByIdAndUpdate(chatId, {$push: { messages: newMessage } }, { new: true })
-    console.log(addMessage);
-    res.json(addMessage);
+    if(!checkIfEmpty(message)){   
+      const addMessage = await Chat.findByIdAndUpdate(chatId, {$push: { messages: newMessage } }, { new: true })
+      res.json(addMessage);
+      next()
+    }
+    next()
   } catch(error) {
     next(error)
   }
