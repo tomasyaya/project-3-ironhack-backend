@@ -156,7 +156,7 @@ router.delete('/:id', isLoggedIn(), async (req, res, next) => {
 
 // ------------- CREATE NEW CHAT ------------
 
-router.post('/chat/:id',  async (req, res, next) => {
+router.post('/chat/:id', isLoggedIn(), async (req, res, next) => {
   const { _id } = req.session.currentUser;
   const { id } = req.params;
   const newChat = {
@@ -167,7 +167,6 @@ router.post('/chat/:id',  async (req, res, next) => {
     const checkChat = await Chat.find(newChat)
     if(checkIfEmpty(checkChat)){
       const chat = await Chat.create(newChat, { new: true })
-      console.log(chat)
       res.json(chat)
     }
   } catch(error) {
@@ -176,7 +175,7 @@ router.post('/chat/:id',  async (req, res, next) => {
 })
 
 // ------- ADD MESSAGE TO CHAT ---------
-router.put('/chat/:id', async (req, res, next) => {
+router.put('/chat/:id', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
   const { _id } = req.session.currentUser;
   const { message } = req.body;
@@ -205,7 +204,7 @@ router.put('/chat/:id', async (req, res, next) => {
 
 // ----------- GET CHAT ---------
 
-router.get('/chat/:id', async (req, res, next) => {
+router.get('/chat/:id', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
   const { _id } = req.session.currentUser;
   const searchChat = {
@@ -222,7 +221,7 @@ router.get('/chat/:id', async (req, res, next) => {
 })
 
 //------ DELETE MESSAGE FROM CHAT ------
-router.delete('/chat/:id/:participant', async (req, res, next) => {
+router.delete('/chat/:id/:participant', isLoggedIn(), async (req, res, next) => {
   const { id, participant } = req.params;
   const chat = {
     participant
@@ -294,5 +293,15 @@ router.get('/favorites', isLoggedIn(), async (req, res, next) => {
     }
   })
 
+  //----------------GET PARTICIPANT ---------------------
+  router.get('/participant/:id', isLoggedIn(), async(req, res, next) => {
+    const { id } = req.params;
+    try {
+      const user = await User.findById(id);
+      res.json(user)
+    }catch(error){
+      next(error)
+    }
+  })
 
 module.exports = router;
