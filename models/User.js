@@ -26,12 +26,16 @@ const userSchema = new Schema({
   own: [{
     type: ObjectId,
     ref: 'Guide'
+  }],
+  likes: [{
+    guide: {
+      type: ObjectId,
+      ref: 'Guide'
+    },
+    count: {
+      type: Number
+    }
   }]
-}, {
-  timestamps: {
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
-  },
 });
 
 const User = mongoose.model('User', userSchema);

@@ -38,7 +38,10 @@ router.post('/login', isNotLoggedIn(), validationLoggin(), (req, res, next) => {
 
 router.post('/signup', isNotLoggedIn(), validationLoggin(), (req, res, next) => {
   const { username, password, name, email } = req.body;
-
+  if(!username || !password || !name || !email ){
+    const message = { message: 'missing fields'}
+    res.json(message)
+  }
   User.findOne({
       username
     }, 'username')
@@ -48,6 +51,7 @@ router.post('/signup', isNotLoggedIn(), validationLoggin(), (req, res, next) => 
         err.status = 422;
         err.statusMessage = 'username-not-unique';
         next(err);
+        return
       }
 
       const salt = bcrypt.genSaltSync(10);

@@ -30,11 +30,35 @@ const guideSchema = new Schema({
       image_url: {
         type: String
       }
+    }],
+    comments: [{
+      creator: {
+        type: ObjectId,
+        ref: 'User'
+      },
+      author: {
+        type: String
+      },
+      message: {
+        type: String
+      }
     }]
   }],
   image: {
     type: String
-  }
+  },
+  reviews: [{
+    review: {
+      type: Number
+    },
+    creator: {
+      type: ObjectId,
+      require: true
+    },
+    likes: {
+      type: Number
+    }
+  }]
 });
 
 const Guide = mongoose.model('Guide', guideSchema);

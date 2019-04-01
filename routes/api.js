@@ -46,6 +46,21 @@ router.put('/guide/:id', isLoggedIn(), async(req, res, next) => {
   }
 })
 
+// --------- ADD MAIN IMAGE ------------
+router.put(`/image/:id`, isLoggedIn(), async (req, res, next) => {
+  const { id } = req.params;
+  const { image } = req.body;
+  const newImage = {
+    image
+  }
+  try {
+    const addImage = await Guide.findByIdAndUpdate(id, newImage)
+    res.json(addImage)
+  } catch(error) {
+    next(error)
+  }
+})
+
 // ---------- COMMENTS -------------
 
 router.put('/comments/:id', isLoggedIn(), async (req, res, next) => {
