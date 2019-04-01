@@ -3,7 +3,7 @@ const router = express.Router();
 const Guide = require('../models/Guide');
 const Chat = require('../models/test');
 const User = require('../models/User');
-const { checkEqual, checkIfEmpty } = require('../helpers/validation')
+const { checkEqual, checkIfEmpty, checkEmptyFields } = require('../helpers/validation')
 const { isLoggedIn } = require('../helpers/middlewares');
 
 
@@ -27,13 +27,16 @@ router.post('/guide', isLoggedIn(), async (req, res, next) => {
 })
 
 
-// ------------- EDIT GUIDE --------------------
+// ------------- EDIT GUIDE (ADD PLACES) --------------------
 router.put('/guide/:id', isLoggedIn(), async(req, res, next) => {
   const { _id: userId } = req.session.currentUser;
   const { id } = req.params;
   const { location, name, what, description } = req.body;
   const place = { location, name, what, description }
   try {
+    if(checkEmptyFields(location, name, what, description)){
+      next(error)
+    }
     const guide = await Guide.findById(id).populate('creator')
     const creatorId = guide.creator._id;
     if(checkEqual(creatorId, userId)){
@@ -42,7 +45,7 @@ router.put('/guide/:id', isLoggedIn(), async(req, res, next) => {
     }
     res.json({message: 'Not your guide, cant update it'})
   }catch(error){
-    res.json(error)
+    next(error)
   }
 })
 
