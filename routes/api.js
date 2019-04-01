@@ -202,6 +202,39 @@ router.put('/chat/:id', isLoggedIn(), async (req, res, next) => {
   }
 });
 
+// --------- REPLAY MESSAGE ----
+
+router.put('/replay/:id', isLoggedIn(), async (req, res, next) => {
+  const { id: chatId } = req.params;
+  const { _id } = req.session.currentUser;
+  const { message } = req.body;
+  try {
+    const { username } = await User.findById(_id)
+    const newMessage = {
+      author: username,
+      message: message
+    }
+    const replay = await Chat.findByIdAndUpdate(chatId, {$push: { messages: newMessage } }, { new: true })
+    console.log(replay)
+    res.json(replay);
+  } catch(error) {
+    next(error)
+  }
+})
+
+// --------- GET REPLAY ---------
+
+router.get('/replay/:id', isLoggedIn(), async (req, res, next) => {
+  const { id } = req.params;
+  console.log(id)
+  try {
+    const chat =  await Chat.findById(id).populate('messages').populate('creator').populate('participants')
+    console.log(chat)
+    res.json(chat)
+  } catch(error){
+    console.log(error)
+  }
+});
 // ----------- GET CHAT ---------
 
 router.get('/chat/:id', isLoggedIn(), async (req, res, next) => {
@@ -213,12 +246,13 @@ router.get('/chat/:id', isLoggedIn(), async (req, res, next) => {
   }
   try {
     const chat = await Chat.find(searchChat);
-    console.log(chat)
     res.json(chat)
   } catch(error) {
     next(error)
   }
 })
+
+
 
 //------ DELETE MESSAGE FROM CHAT ------
 router.delete('/chat/:id/:participant', isLoggedIn(), async (req, res, next) => {
@@ -233,6 +267,17 @@ router.delete('/chat/:id/:participant', isLoggedIn(), async (req, res, next) => 
     res.json(removeChat)
   } catch(error){
     console.log(error)
+  }
+})
+
+// -------- DELETE REPLAY -------
+router.delete('/replay/:chat/:message', isLoggedIn(), async (req, res, next) => {
+  const { chat, message } = req.params;
+  try {
+    const remove = await Chat.findByIdAndUpdate(chat, {$pull: { messages: { _id: message } }}, { new: true })
+    res.json(remove)
+  } catch(error) {
+    next(error)
   }
 })
 
@@ -303,5 +348,23 @@ router.get('/favorites', isLoggedIn(), async (req, res, next) => {
       next(error)
     }
   })
+
+  // ----------- GET  MESSAGES -------
+
+  router.get('/messages/:user', isLoggedIn(), async(req, res, next) => {
+    const { _id } = req.session.currentUser;
+    const { user } = req.params;
+    const message = {
+      [user]: _id
+    }
+    try {
+      const chat = await Chat.find(message).populate('creator').populate('participant').populate('messages')
+      res.json(chat)
+    } catch(error) {
+      console.log(error)
+    }
+  })
+
+
 
 module.exports = router;
