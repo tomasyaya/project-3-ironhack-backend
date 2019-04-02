@@ -92,7 +92,7 @@ router.put(`/review/:id`, isLoggedIn(), async (req, res, next) => {
     creator: _id
   }
   try {
-    const addReview = await Place.findByIdAndUpdate(id, { reviews: newReview }, { new: true }).populate('reviews')
+    const addReview = await Place.findByIdAndUpdate(id, {$push: { reviews: newReview } }, { new: true }).populate('reviews')
     console.log(addReview)
     res.json(addReview)
   } catch(error) {
