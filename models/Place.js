@@ -14,6 +14,9 @@ const placeSchema = new Schema({
   location: {
     type: String
   },
+  description: {
+    type: String
+  },
   type: {
     type: String
   },
@@ -31,7 +34,7 @@ const placeSchema = new Schema({
       type: String,
     },
     author: {
-      type: Sting
+      type: String
     },
     likes: {
       type: Number

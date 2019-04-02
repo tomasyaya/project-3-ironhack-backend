@@ -15,7 +15,7 @@ const guideSchema = new Schema({
   title: {
     type: String
   },
-  location: [{
+  locations: [{
     type: ObjectId,
     ref: 'Place'
   }],
