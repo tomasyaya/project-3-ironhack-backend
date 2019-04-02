@@ -58,7 +58,7 @@ router.delete(`/:id`, isLoggedIn(), async (req, res, next) => {
 router.get('/one/:id', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
   try {
-    const place = await Place.findById(id).populate('images')
+    const place = await Place.findById(id).populate('images').populate('comments')
     res.json(place)
   } catch(error) {
     next(error)
@@ -95,6 +95,36 @@ router.put(`/review/:id`, isLoggedIn(), async (req, res, next) => {
     const addReview = await Place.findByIdAndUpdate(id, {$push: { reviews: newReview } }, { new: true }).populate('reviews')
     console.log(addReview)
     res.json(addReview)
+  } catch(error) {
+    next(error)
+  }
+})
+
+//------- ADD COMMENT -------
+router.put('/comment/:id', isLoggedIn(), async (req, res, next) => {
+  const { id } = req.params;
+  const { message } = req.body;
+  const { _id } = req.session.currentUser;
+  try {
+    const { username }  = await User.findById(_id)
+      const newComment = {
+        cretor: _id,
+        message,
+        author: username
+      }
+    const addComment = await Place.findByIdAndUpdate(id, {$push: { comments: newComment } }, { new: true })
+    res.json(addComment)
+  } catch(error) {
+    next(error)
+  }
+})
+
+// ----- REMOVE COMMENT -------
+router.put('/comment/remove/:id', isLoggedIn(), async(req, res, next) => {
+  const { id } = req.params;
+  try {
+    const removeComment = await Place.findByIdAndUpdate(id, {$pull: {comments: { _id: id } }}, { new: true  })
+    res.json(removeComment);
   } catch(error) {
     next(error)
   }

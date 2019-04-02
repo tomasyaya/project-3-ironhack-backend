@@ -26,7 +26,7 @@ const placeSchema = new Schema({
     }
   }],
   comments: [{
-    cretor: {
+    creator: {
       type: ObjectId,
       ref: 'User'
     },
