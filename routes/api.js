@@ -28,26 +28,26 @@ router.post('/guide', isLoggedIn(), async (req, res, next) => {
 
 
 // ------------- EDIT GUIDE (ADD PLACES) --------------------
-router.put('/guide/:id', isLoggedIn(), async(req, res, next) => {
-  const { _id: userId } = req.session.currentUser;
-  const { id } = req.params;
-  const { location, name, what, description } = req.body;
-  const place = { location, name, what, description }
-  try {
-    if(checkEmptyFields(location, name, what, description)){
-      next(error)
-    }
-    const guide = await Guide.findById(id).populate('creator')
-    const creatorId = guide.creator._id;
-    if(checkEqual(creatorId, userId)){
-      const updateGuide = await Guide.findByIdAndUpdate(id, {$push: {places: place}}, {new: true});
-      res.json(updateGuide)
-    }
-    res.json({message: 'Not your guide, cant update it'})
-  }catch(error){
-    next(error)
-  }
-})
+// router.put('/guide/:id', isLoggedIn(), async(req, res, next) => {
+//   const { _id: userId } = req.session.currentUser;
+//   const { id } = req.params;
+//   const { location, name, what, description } = req.body;
+//   const place = { location, name, what, description }
+//   try {
+//     if(checkEmptyFields(location, name, what, description)){
+//       next(error)
+//     }
+//     const guide = await Guide.findById(id).populate('creator')
+//     const creatorId = guide.creator._id;
+//     if(checkEqual(creatorId, userId)){
+//       const updateGuide = await Guide.findByIdAndUpdate(id, {$push: {places: place}}, {new: true});
+//       res.json(updateGuide)
+//     }
+//     res.json({message: 'Not your guide, cant update it'})
+//   }catch(error){
+//     next(error)
+//   }
+// })
 
 // --------- ADD MAIN IMAGE ------------
 router.put(`/image/:id`, isLoggedIn(), async (req, res, next) => {
@@ -102,18 +102,18 @@ router.delete('/comments/:guide/:id', isLoggedIn(), async (req, res, next) => {
 
 // ------------- DELETE PLACE IN GUIDE -------
 
-router.put('/places/:id/:place', isLoggedIn(), async (req, res, next) => {
-  const { id, place } = req.params;
-  const remove = {
-    _id: place
-  }
-  try {
-    const deletePlace = await Guide.findByIdAndUpdate(id, {$pull: {places: remove }}, {new: true})
-    res.json(deletePlace)
-  }catch(error){
-    console.log(error)
-  }
-})
+// router.put('/places/:id/:place', isLoggedIn(), async (req, res, next) => {
+//   const { id, place } = req.params;
+//   const remove = {
+//     _id: place
+//   }
+//   try {
+//     const deletePlace = await Guide.findByIdAndUpdate(id, {$pull: {places: remove }}, {new: true})
+//     res.json(deletePlace)
+//   }catch(error){
+//     console.log(error)
+//   }
+// })
 
 //------------ ADD/REMOVE GUIDES TO/FROM FAVORITE ------------
 router.put('/favorites/:id', isLoggedIn(), async(req, res, next) => {
@@ -175,32 +175,32 @@ router.post('/chat/:id', isLoggedIn(), async (req, res, next) => {
 })
 
 // ------- ADD MESSAGE TO CHAT ---------
-router.put('/chat/:id', isLoggedIn(), async (req, res, next) => {
-  const { id } = req.params;
-  const { _id } = req.session.currentUser;
-  const { message } = req.body;
-  const searchChat = {
-    creator: _id,
-    participant: id
-  }
-  try {
-    const { username } = await User.findById(_id);
-    const findChat = await Chat.find(searchChat);
-    const { _id: chatId } = findChat[0]
-    const newMessage = {
-      author: username,
-      message: message
-    }
-    if(!checkIfEmpty(message)){   
-      const addMessage = await Chat.findByIdAndUpdate(chatId, {$push: { messages: newMessage } }, { new: true })
-      res.json(addMessage);
-      next()
-    }
-    next()
-  } catch(error) {
-    next(error)
-  }
-});
+// router.put('/chat/:id', isLoggedIn(), async (req, res, next) => {
+//   const { id } = req.params;
+//   const { _id } = req.session.currentUser;
+//   const { message } = req.body;
+//   const searchChat = {
+//     creator: _id,
+//     participant: id
+//   }
+//   try {
+//     const { username } = await User.findById(_id);
+//     const findChat = await Chat.find(searchChat);
+//     const { _id: chatId } = findChat[0]
+//     const newMessage = {
+//       author: username,
+//       message: message
+//     }
+//     if(!checkIfEmpty(message)){   
+//       const addMessage = await Chat.findByIdAndUpdate(chatId, {$push: { messages: newMessage } }, { new: true })
+//       res.json(addMessage);
+//       next()
+//     }
+//     next()
+//   } catch(error) {
+//     next(error)
+//   }
+// });
 
 // --------- REPLAY MESSAGE ----
 
@@ -208,6 +208,10 @@ router.put('/replay/:id', isLoggedIn(), async (req, res, next) => {
   const { id: chatId } = req.params;
   const { _id } = req.session.currentUser;
   const { message } = req.body;
+  if(checkEmptyFields(message)){
+    next(error)
+    return
+  }
   try {
     const { username } = await User.findById(_id)
     const newMessage = {
@@ -367,29 +371,29 @@ router.get('/favorites', isLoggedIn(), async (req, res, next) => {
 
 
   // ------- GET PLACE ---------
-  router.get(`/place/:id`, isLoggedIn(), async (req, res, next) => {
-    const { id } = req.params;
+  // router.get(`/place/:id`, isLoggedIn(), async (req, res, next) => {
+  //   const { id } = req.params;
    
-    try {
-      const search = await Guide.findOne({places: {$elemMatch: {_id: id}}})
-      res.json(search)
-    } catch(error) {
-      next(error)
-    }
-  })
+  //   try {
+  //     const search = await Guide.findOne({places: {$elemMatch: {_id: id}}})
+  //     res.json(search)
+  //   } catch(error) {
+  //     next(error)
+  //   }
+  // })
 
   // ------- ADD IMAGES TO PLACES  ---------
-  router.put(`/place/:guide/:place`, isLoggedIn(), async (req, res, next) => {
-    const { guide, place } = req.params;
-    const { img } = req.body;
-    try {
-      const test = await Guide.findByIdAndUpdate(guide, {$push: {} }, { new: true })
-      console.log(test)
-      res.json(test)
-    } catch(error) {
-      next(error)
-    }
-  })
+  // router.put(`/place/:guide/:place`, isLoggedIn(), async (req, res, next) => {
+  //   const { guide, place } = req.params;
+  //   const { img } = req.body;
+  //   try {
+  //     const test = await Guide.findByIdAndUpdate(guide, {$push: {} }, { new: true })
+  //     console.log(test)
+  //     res.json(test)
+  //   } catch(error) {
+  //     next(error)
+  //   }
+  // })
 
 
 
