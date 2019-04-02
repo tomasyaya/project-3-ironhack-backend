@@ -141,32 +141,32 @@ router.post('/chat/:id', isLoggedIn(), async (req, res, next) => {
 })
 
 // ------- ADD MESSAGE TO CHAT ---------
-// router.put('/chat/:id', isLoggedIn(), async (req, res, next) => {
-//   const { id } = req.params;
-//   const { _id } = req.session.currentUser;
-//   const { message } = req.body;
-//   const searchChat = {
-//     creator: _id,
-//     participant: id
-//   }
-//   try {
-//     const { username } = await User.findById(_id);
-//     const findChat = await Chat.find(searchChat);
-//     const { _id: chatId } = findChat[0]
-//     const newMessage = {
-//       author: username,
-//       message: message
-//     }
-//     if(!checkIfEmpty(message)){   
-//       const addMessage = await Chat.findByIdAndUpdate(chatId, {$push: { messages: newMessage } }, { new: true })
-//       res.json(addMessage);
-//       next()
-//     }
-//     next()
-//   } catch(error) {
-//     next(error)
-//   }
-// });
+router.put('/chat/:id', isLoggedIn(), async (req, res, next) => {
+  const { id } = req.params;
+  const { _id } = req.session.currentUser;
+  const { message } = req.body;
+  const searchChat = {
+    creator: _id,
+    participant: id
+  }
+  try {
+    const { username } = await User.findById(_id);
+    const findChat = await Chat.find(searchChat);
+    const { _id: chatId } = findChat[0]
+    const newMessage = {
+      author: username,
+      message: message
+    }
+    if(!checkIfEmpty(message)){   
+      const addMessage = await Chat.findByIdAndUpdate(chatId, {$push: { messages: newMessage } }, { new: true })
+      res.json(addMessage);
+      next()
+    }
+    next()
+  } catch(error) {
+    next(error)
+  }
+});
 
 // --------- REPLAY MESSAGE ----
 
@@ -284,7 +284,7 @@ router.get('/guide/:id', isLoggedIn(), async (req, res, next) => {
       next(error)
     }
   })
-
+   
 // ------------ GET FAVORITES ---------------
 router.get('/favorites', isLoggedIn(), async (req, res, next) => {
   const { _id } = req.session.currentUser;
