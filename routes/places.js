@@ -54,6 +54,34 @@ router.delete(`/:id`, isLoggedIn(), async (req, res, next) => {
   }
 })
 
+// ------- GET PLACE --------
+router.get('/one/:id', isLoggedIn(), async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const place = await Place.findById(id).populate('images')
+    res.json(place)
+  } catch(error) {
+    next(error)
+  }
+})
+
+// --------- ADD IMAGE ------------
+router.put(`/:id`, isLoggedIn(), async (req, res, next) => {
+  const { id } = req.params;
+  const { image } = req.body;
+  const newImage = {
+    url: image
+  }
+  console.log(newImage)
+  try {
+    const addImage = await Place.findByIdAndUpdate(id, {$push: { images: newImage } }, { new: true })
+    console.log(addImage)
+    res.json(addImage)
+  } catch(error) {
+    next(error)
+  }
+})
+
 
 
 module.exports = router;
