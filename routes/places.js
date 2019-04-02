@@ -82,6 +82,24 @@ router.put(`/:id`, isLoggedIn(), async (req, res, next) => {
   }
 })
 
+// -------- ADD REVIEW ------
+router.put(`/review/:id`, isLoggedIn(), async (req, res, next) => {
+  const { id } = req.params;
+  const { _id } = req.session.currentUser;
+  const { review } = req.body;
+  const newReview = {
+    review,
+    creator: _id
+  }
+  try {
+    const addReview = await Place.findByIdAndUpdate(id, { reviews: newReview }, { new: true }).populate('reviews')
+    console.log(addReview)
+    res.json(addReview)
+  } catch(error) {
+    next(error)
+  }
+})
+
 
 
 module.exports = router;

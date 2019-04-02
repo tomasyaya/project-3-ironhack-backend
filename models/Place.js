@@ -35,21 +35,26 @@ const placeSchema = new Schema({
     },
     author: {
       type: String
+    }
+  }],
+  likes: [{
+    user: {
+      type: ObjectId,
+      ref: 'User'
     },
-    likes: {
+    like: {
       type: Number
+    }
+  }],
+  reviews: [{
+    user: {
+      type: ObjectId,
+      ref: 'User'
     },
-    reviews: [{
-      user: {
-        type: ObjectId,
-        ref: 'User'
-      },
-      review: {
-        type: Number
-      }
-    }]
+    review: {
+      type: Number
+    }
   }]
-
 });
 
 const Place = mongoose.model('Place', placeSchema);
