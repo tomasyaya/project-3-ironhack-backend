@@ -15,6 +15,10 @@ const guideSchema = new Schema({
   title: {
     type: String
   },
+  location: [{
+    type: ObjectId,
+    ref: 'Place'
+  }],
   comments: [{
     creator: ObjectId,
     name: String,
@@ -25,24 +29,6 @@ const guideSchema = new Schema({
     description: String,
     what: String,
     location: String,
-    image: String,
-    images: [{
-      image_url: {
-        type: String
-      }
-    }],
-    comments: [{
-      creator: {
-        type: ObjectId,
-        ref: 'User'
-      },
-      author: {
-        type: String
-      },
-      message: {
-        type: String
-      }
-    }]
   }],
   image: {
     type: String

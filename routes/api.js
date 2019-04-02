@@ -366,5 +366,31 @@ router.get('/favorites', isLoggedIn(), async (req, res, next) => {
   })
 
 
+  // ------- GET PLACE ---------
+  router.get(`/place/:id`, isLoggedIn(), async (req, res, next) => {
+    const { id } = req.params;
+   
+    try {
+      const search = await Guide.findOne({places: {$elemMatch: {_id: id}}})
+      res.json(search)
+    } catch(error) {
+      next(error)
+    }
+  })
+
+  // ------- ADD IMAGES TO PLACES  ---------
+  router.put(`/place/:guide/:place`, isLoggedIn(), async (req, res, next) => {
+    const { guide, place } = req.params;
+    const { img } = req.body;
+    try {
+      const test = await Guide.findByIdAndUpdate(guide, {$push: {} }, { new: true })
+      console.log(test)
+      res.json(test)
+    } catch(error) {
+      next(error)
+    }
+  })
+
+
 
 module.exports = router;
