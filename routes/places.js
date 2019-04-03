@@ -72,10 +72,8 @@ router.put(`/:id`, isLoggedIn(), async (req, res, next) => {
   const newImage = {
     url: image
   }
-  console.log(newImage)
   try {
     const addImage = await Place.findByIdAndUpdate(id, {$push: { images: newImage } }, { new: true })
-    console.log(addImage)
     res.json(addImage)
   } catch(error) {
     next(error)
@@ -93,7 +91,6 @@ router.put(`/review/:id`, isLoggedIn(), async (req, res, next) => {
   }
   try {
     const addReview = await Place.findByIdAndUpdate(id, {$push: { reviews: newReview } }, { new: true }).populate('reviews')
-    console.log(addReview)
     res.json(addReview)
   } catch(error) {
     next(error)
@@ -105,6 +102,10 @@ router.put('/comment/:id', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
   const { message } = req.body;
   const { _id } = req.session.currentUser;
+  if(checkEmptyFields(message)){
+    next()
+    return
+  }
   try {
     const { username }  = await User.findById(_id)
       const newComment = {
@@ -138,15 +139,22 @@ router.put('/like/:id', isLoggedIn(), async (req, res, next) => {
       user: _id
   } 
   try {
-    const like = await Place.find({'likes': {$elemMatch: searchLike } })
-    if(checkIfEmpty(like)) {
+    const places = await Place.find({'likes': {$elemMatch: searchLike } })
+    let hasLike = false
+    places.forEach(place => {
+      const { _id: placeId } = place
+      if(checkEqual(placeId, id)) {
+        hasLike = true;
+        return hasLike
+      }
+    })
+    if(!hasLike) {
       const newLike = {
         user: _id,
         like: 1,
         place: id
       }
       const addLike = await Place.findByIdAndUpdate(id, {$push: {likes: newLike} }, { new: true})
-      console.log(addLike)
       res.json(addLike)
       return
     }

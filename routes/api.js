@@ -24,7 +24,6 @@ router.post('/guide', isLoggedIn(), async (req, res, next) => {
       creator: newUser._id
     }
     const newGuide = await Guide.create(guide)
-    console.log(newGuide)
     res.json(newGuide)
   }catch(error){
     next(error)
@@ -190,7 +189,6 @@ router.put('/replay/:id', isLoggedIn(), async (req, res, next) => {
       message: message
     }
     const replay = await Chat.findByIdAndUpdate(chatId, {$push: { messages: newMessage } }, { new: true })
-    console.log(replay)
     res.json(replay);
   } catch(error) {
     next(error)
@@ -201,13 +199,11 @@ router.put('/replay/:id', isLoggedIn(), async (req, res, next) => {
 
 router.get('/replay/:id', isLoggedIn(), async (req, res, next) => {
   const { id } = req.params;
-  console.log(id)
   try {
     const chat =  await Chat.findById(id).populate('messages').populate('creator').populate('participants')
-    console.log(chat)
     res.json(chat)
   } catch(error){
-    console.log(error)
+    next(error)
   }
 });
 // ----------- GET CHAT ---------
@@ -241,7 +237,7 @@ router.delete('/chat/:id/:participant', isLoggedIn(), async (req, res, next) => 
     const removeChat = await Chat.findByIdAndUpdate(_id, {$pull: { messages: { _id: id } } }, { new: true })
     res.json(removeChat)
   } catch(error){
-    console.log(error)
+    next(error)
   }
 })
 
@@ -297,7 +293,7 @@ router.get('/favorites', isLoggedIn(), async (req, res, next) => {
     const favorites = await User.findById(_id).populate('favorites');
     res.json(favorites)
   } catch(error){
-    console.log(error)
+    next(error)
   }
 })
 
@@ -336,7 +332,7 @@ router.get('/favorites', isLoggedIn(), async (req, res, next) => {
       const chat = await Chat.find(message).populate('creator').populate('participant').populate('messages')
       res.json(chat)
     } catch(error) {
-      console.log(error)
+      next(error)
     }
   })
 
