@@ -12,6 +12,10 @@ const { isLoggedIn } = require('../helpers/middlewares');
 router.post('/guide', isLoggedIn(), async (req, res, next) => {
   const { _id } = req.session.currentUser;
   const { location, title } = req.body;
+  if(checkEmptyFields(location, title)){
+    next()
+    return
+  }
   try {
     const newUser = await User.findById(_id)
     const guide = {
@@ -20,6 +24,7 @@ router.post('/guide', isLoggedIn(), async (req, res, next) => {
       creator: newUser._id
     }
     const newGuide = await Guide.create(guide)
+    console.log(newGuide)
     res.json(newGuide)
   }catch(error){
     next(error)
