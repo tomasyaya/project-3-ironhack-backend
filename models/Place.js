@@ -44,6 +44,10 @@ const placeSchema = new Schema({
     },
     like: {
       type: Number
+    },
+    place: {
+      type: ObjectId,
+      ref: 'Place'
     }
   }],
   reviews: [{

@@ -142,9 +142,11 @@ router.put('/like/:id', isLoggedIn(), async (req, res, next) => {
     if(checkIfEmpty(like)) {
       const newLike = {
         user: _id,
-        like: 1
+        like: 1,
+        place: id
       }
       const addLike = await Place.findByIdAndUpdate(id, {$push: {likes: newLike} }, { new: true})
+      console.log(addLike)
       res.json(addLike)
       return
     }
@@ -154,6 +156,8 @@ router.put('/like/:id', isLoggedIn(), async (req, res, next) => {
     next(error)
   }
 })
+
+
 
 
 
