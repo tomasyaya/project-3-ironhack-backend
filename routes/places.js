@@ -108,7 +108,7 @@ router.put('/comment/:id', isLoggedIn(), async (req, res, next) => {
   try {
     const { username }  = await User.findById(_id)
       const newComment = {
-        cretor: _id,
+        creator: _id,
         message,
         author: username
       }
@@ -120,11 +120,36 @@ router.put('/comment/:id', isLoggedIn(), async (req, res, next) => {
 })
 
 // ----- REMOVE COMMENT -------
-router.put('/comment/remove/:id', isLoggedIn(), async(req, res, next) => {
-  const { id } = req.params;
+router.put('/comment/:place/:comment', isLoggedIn(), async(req, res, next) => {
+  const { place: placeId, comment: commentId } = req.params;
   try {
-    const removeComment = await Place.findByIdAndUpdate(id, {$pull: {comments: { _id: id } }}, { new: true  })
+    const removeComment = await Place.findByIdAndUpdate(placeId, {$pull: {comments: { _id: commentId } }}, { new: true  })
     res.json(removeComment);
+  } catch(error) {
+    next(error)
+  }
+})
+
+//--------- ADD LIKE ---------
+router.put('/like/:id', isLoggedIn(), async (req, res, next) => {
+  const { id } = req.params;
+  const { _id } = req.session.currentUser;
+  const searchLike = {
+      user: _id
+  } 
+  try {
+    const like = await Place.find({'likes': {$elemMatch: searchLike } })
+    if(checkIfEmpty(like)) {
+      const newLike = {
+        user: _id,
+        like: 1
+      }
+      const addLike = await Place.findByIdAndUpdate(id, {$push: {likes: newLike} }, { new: true})
+      res.json(addLike)
+      return
+    }
+    const removeLike = await Place.findByIdAndUpdate(id, {$pull: {likes: searchLike} }, { new: true})
+    res.json(removeLike)
   } catch(error) {
     next(error)
   }
