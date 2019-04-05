@@ -27,10 +27,10 @@ router.post('/login', isNotLoggedIn(), validationLoggin(), (req, res, next) => {
         req.session.currentUser = user;
         return res.status(200).json(user);
       } else {
-        const err = new Error('Unauthorized');
-        err.status = 401;
-        err.statusMessage = 'Unauthorized';
-        next(err);
+        return res.status(401).json({
+          error:true,
+          message:'Unauthorized'
+        })
       }
     })
     .catch(next);
